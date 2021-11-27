@@ -1,16 +1,21 @@
 #pragma once
 #include <cstddef>
 
-
-
 class ItemType
 {
-public:
+private:
 	int n;
 	int* A;
 	int x;
 	int y;
 	int line;
+public:
+	int getN();
+	int* getA();
+	int getX();
+	int getY();
+	int getLine();
+	void setLine(int line);
 	ItemType() {
 		n = -1;
 		A = NULL;
@@ -24,5 +29,5 @@ public:
 		this->x = x;
 		this->y = y;
 		this->line = line;
-	};	
+	};
 };

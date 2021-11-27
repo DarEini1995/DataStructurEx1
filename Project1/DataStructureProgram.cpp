@@ -10,24 +10,26 @@
 #include "DataStuctureProgram.h"
 #include "Stack.h"
 #include "ItemType.h"
-
+#include <functional>
+#include "InputHandler.h"
+#include <chrono>
+#include <fstream>
+#include <iomanip>
 
 int START=0;
 int AFTER_FIRST=1;
 int AFTER_SECOND=2;
 int AFTER_THIRD = 3;
+#define WRONG_INPUT 0
 
 using namespace std;
-
 
 #define _CRT_SECURE_NO_WARNINGS
 
 
-void findSumInRecursiveWay(int* A, int n, int x)
-{
+void findSumInRecursiveWayInit(int* A, int n, int x) {
 	findSumInRecursiveWay(A, n, x, 0);
 }
-
 
 void findSumInRecursiveWay(int* A, int n, int x, int y) {
 	if ((n == 1) && (y != 0)) {
@@ -53,10 +55,10 @@ void findSumInRecursiveWay(int* A, int n, int x, int y) {
 	}
 }
 
-void findSumInWithStack(int* A, int n, int x)
-{
+void findSumInWithStackInit(int* A, int n, int x) {
 	findSumInWithStack(A, n, x, 0);
 }
+
 
 void findSumInWithStack(int* A, int n, int x, int y)
 {
@@ -69,50 +71,50 @@ void findSumInWithStack(int* A, int n, int x, int y)
 	S.Push(Curr);
 	while (!S.IsEmpty()) {
 		Curr = S.Pop();
-		if (Curr.line == START)
+		if (Curr.getLine() == START)
 		{
-			if ((Curr.n == 1) && (Curr.y != 0)) {
-				if (Curr.x == Curr.A[0] + Curr.y) {
-					cout << Curr.y << " " << Curr.A[0] << "\n";
+			if ((Curr.getN() == 1) && (Curr.getY() != 0)) {
+				if (Curr.getX() == Curr.getA()[0] + Curr.getY()) {
+					cout << Curr.getY() << " " << Curr.getA()[0] << "\n";
 				}
 			}
-			if ((Curr.n == 1) && (Curr.y == 0)) {
+			if ((Curr.getN() == 1) && (Curr.getY() == 0)) {
 				cout << "";
 			}
-			else if (Curr.n != 1)
+			else if (Curr.getN() != 1)
 			{
-				if (Curr.y != 0)
+				if (Curr.getY() != 0)
 				{
-					if (Curr.x == Curr.A[Curr.n - 1] + Curr.y) {
-						cout << Curr.y << " " << Curr.A[Curr.n - 1] << "\n";
+					if (Curr.getX() == Curr.getA()[Curr.getN() - 1] + Curr.getY()) {
+						cout << Curr.getY() << " " << Curr.getA()[Curr.getN() - 1] << "\n";
 					}
-					Curr.line = AFTER_FIRST;
+					Curr.setLine(AFTER_FIRST);
 					S.Push(Curr);
-					Next = { Curr.A, Curr.n - 1, Curr.x, Curr.y, START};
+					Next = { Curr.getA(), Curr.getN() - 1, Curr.getX(), Curr.getY(), START};
 					S.Push(Next);
 				}
-				else if (Curr.y == 0)
+				else if (Curr.getY() == 0)
 				{
-					Curr.line = AFTER_SECOND;
+					Curr.setLine(AFTER_SECOND);
 					S.Push(Curr);
-					Next = { Curr.A, Curr.n - 1, Curr.x, Curr.A[Curr.n - 1], START };
+					Next = { Curr.getA(), Curr.getN() - 1, Curr.getX(), Curr.getA()[Curr.getN() - 1], START };
 					S.Push(Next);
 				}
 
 			}
 		}
-		else if (Curr.line == AFTER_FIRST)
+		else if (Curr.getLine() == AFTER_FIRST)
 		{
 			//noting more happends
 		}
-		else if (Curr.line == AFTER_SECOND)
+		else if (Curr.getLine() == AFTER_SECOND)
 		{
-			Curr.line = AFTER_THIRD;
+			Curr.setLine(AFTER_THIRD);
 			S.Push(Curr);
-			Next = { Curr.A, Curr.n - 1, Curr.x, 0, START };
+			Next = { Curr.getA(), Curr.getN() - 1, Curr.getX(), 0, START };
 			S.Push(Next);
 		}
-		else if (Curr.line == AFTER_THIRD)
+		else if (Curr.getLine() == AFTER_THIRD)
 		{
 			//noting more happends
 		}
@@ -132,7 +134,6 @@ bool isPrinted(vector <vector <int>> printedIndexes, int i, int j) {
 
 void findSumInIterativeWay(int* nativeNumbers, int n, int x) {
 	vector <vector <int>> printedIndexes;
-	int iVec = 0;
 
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < n; j++) {
@@ -151,15 +152,50 @@ void findSumInIterativeWay(int* nativeNumbers, int n, int x) {
 }
 
 
+string runAndMeasure(int* A, int n, int x, function<void(int*,int,int)> func,string funcName) {
+	auto start = chrono::high_resolution_clock::now();
+	// unsync the I/O of C and C++.
+	ios_base::sync_with_stdio(false);
+	func(A, n, x);
+	auto end = chrono::high_resolution_clock::now();
+	// Calculating total time taken by the program.
+	double time_taken =
+		chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+	time_taken *= 1e-9;
+	
+	std::ostringstream output;
+	output << "Time taken by function " << funcName << " is : " << fixed
+		<< time_taken << setprecision(9) << " sec" << endl;
+
+	return output.str();
+}
+
+void saveToFile(string output) {
+	ofstream myfile("Measure.txt"); // The name of the file
+	myfile << output;
+	myfile.close();
+}
+
+void exitProgram() {
+	cout << "wrong input";
+	exit(0);
+}
+
 int main() {
-	int n;
+	int arrSize = getANativeNum();
+	if (arrSize == WRONG_INPUT) exitProgram();
+	int* arr = getArr(arrSize);
+	if (arr == WRONG_INPUT) exitProgram();
+	int sum = getANativeNum();
+	if (sum == WRONG_INPUT) exitProgram();
 
-	//test
-	int arr[8] = { 5,5,4,5,2,4,3,1 };
-	int size = 8;
-	int x = 3;
-	//findSumInIterativeWay(arr, size, x);
-	//findSumInrecursiveWay(arr, size, x,0);
-	findSumInWithStack(arr, size, x);
+	string output = "";
 
+	cout << "Iterative:\n";
+	output += runAndMeasure(arr, arrSize, sum, findSumInIterativeWay, "findSumInIterativeWay");
+	cout << "Recursive:\n";
+	output += runAndMeasure(arr, arrSize, sum, findSumInRecursiveWayInit, "findSumInRecursiveWay");
+	cout << "Recursion implemented using stack:\n";
+	output += runAndMeasure(arr, arrSize, sum, findSumInWithStackInit, "findSumInWithStack");
+	saveToFile(output);
 }

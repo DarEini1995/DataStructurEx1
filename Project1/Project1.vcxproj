@@ -140,11 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DataStructureProgram.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="ItemType.cpp" />
     <ClCompile Include="Stack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataStuctureProgram.h" />
+    <ClInclude Include="InputHandler.h" />
     <ClInclude Include="ItemType.h" />
     <ClInclude Include="Stack.h" />
   </ItemGroup>
