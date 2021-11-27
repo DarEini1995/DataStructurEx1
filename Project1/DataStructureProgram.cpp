@@ -193,9 +193,9 @@ int main() {
 
 	cout << "Iterative:\n";
 	output += runAndMeasure(arr, arrSize, sum, findSumInIterativeWay, "findSumInIterativeWay");
-	cout << "Recursive:\n";
+	cout << "\nRecursive:\n";
 	output += runAndMeasure(arr, arrSize, sum, findSumInRecursiveWayInit, "findSumInRecursiveWay");
-	cout << "Recursion implemented using stack:\n";
+	cout << "\nRecursion implemented using stack:\n";
 	output += runAndMeasure(arr, arrSize, sum, findSumInWithStackInit, "findSumInWithStack");
 	saveToFile(output);
 }
